@@ -1,0 +1,179 @@
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    Context context;
+
+    public DatabaseHelper(Context context) {
+        // TODO Auto-generated constructor stub
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    String password;
+    String emailid;
+    String firstname;
+
+    // Database Version
+    private static final int DATABASE_VERSION = 1;
+    // Database Name
+    private static final String DATABASE_NAME = "Mydatabase.db";
+
+    // Contacts table name
+    public static String TABLE = "mytable";
+    public static final String ID = "id";
+    public static final String FIRST_NAME = " firstname";
+    public static final String LAST_NAME = "lastname";
+    public static final String EMAIL_ID = "email";
+    public static final String PHONE_NUMBER = "phonenumber";
+    public static final String PASSWORD = "password";
+    public static final String PHOTO = "photo";
+
+    String br;
+
+
+    // private SQLiteDatabase db;
+
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        // TODO Auto-generated method stub
+        br = "CREATE TABLE " + TABLE + "(" + ID + " INTEGER PRIMARY KEY,"+ FIRST_NAME + " Text, " + LAST_NAME + " Text, " + EMAIL_ID + " Text, " + PHONE_NUMBER + " Text," + PASSWORD + " Text," + PHOTO + " BLOB);";
+        db.execSQL(br);
+
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO Auto-generated method stub
+        // Drop older table if existed
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE);
+
+        // Create tables again
+        onCreate(db);
+    }
+
+    public void addregister(Registerdata reg) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FIRST_NAME, reg.getFirstname()); // register first Name
+        values.put(LAST_NAME, reg.getLastname()); // register last name
+        values.put(EMAIL_ID, reg.getEmail());//register email id
+        values.put(PHONE_NUMBER, reg.getPhonenumber());
+        values.put(PASSWORD, reg.getPassword());
+        values.put(PHOTO, reg.getPhoto());
+        // Inserting Row
+
+        db.insert(TABLE, null, values);
+        // Closing database connection
+        db.close();
+
+    }
+    public  String getdata(String strDocument){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE + " WHERE    email=? ", new String[]{strDocument});
+
+
+        if (cursor.getCount() < 1) {
+            cursor.close();
+            return "Not Exist";
+        } else if (cursor.getCount() >= 1 && cursor.moveToFirst()) {
+
+            emailid = cursor.getString(cursor.getColumnIndex(EMAIL_ID));
+            cursor.close();
+
+        }
+        return emailid;
+
+    }
+
+   /* String getregister(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectquery = "SELECT * FROM TABLE";
+        Cursor cursor = db.query(TABLE,null,"email=?", new String[]{email}, null, null, null, null);
+
+        if (cursor.getCount() < 1) {
+            cursor.close();
+            return "Not Exist";
+        } else if (cursor.getCount() >= 1 && cursor.moveToFirst()) {
+
+            emailid = cursor.getString(cursor.getColumnIndex(EMAIL_ID));
+            cursor.close();
+
+        }
+        return emailid;
+    }*/
+
+    /*String storepassword(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectquery="SELECT * FROM TABLE";
+        Cursor cursor = db.query(TABLE, null, "email=?", new String[]{username}, null, null, null, null);
+
+
+        if (cursor.getCount() < 1) {
+            cursor.close();
+            return "Not Exist";
+        } else if (cursor.getCount() >= 1 && cursor.moveToFirst()) {
+
+            password = cursor.getString(cursor.getColumnIndex(PASSWORD));
+            cursor.close();
+
+        }
+        return password;
+    }*/
+
+    public Cursor getAllPersons() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery( "SELECT * FROM " + TABLE, null );
+        return res;
+    }
+
+    public boolean update(String id, String f, String l, String p) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FIRST_NAME,f);
+        values.put(LAST_NAME,l);
+        values.put(PHONE_NUMBER,p);
+        int result=db.update(TABLE,values,"id =?",new String[]{(id)});
+        if (result>0){
+            return true;
+        }else
+        {
+            return false;
+        }
+    }
+    public boolean updatepass(String id, String p) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(PASSWORD,p);
+        int result=db.update(TABLE,values,"id =?",new String[]{(id)});
+        if (result>0){
+            return true;
+        }else
+        {
+            return false;
+        }
+    }
+    public String getDatabaseName() {
+        return DATABASE_NAME;
+    }
+
+    public static String getKeyId() {
+        return ID;
+    }
+
+    public static String getTableContacts() {
+        return TABLE;
+    }
+
+    public static int getDatabaseVersion() {
+        return DATABASE_VERSION;
+    }
+
+
+    // Updating single contact
+
+}
